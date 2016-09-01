@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.checkium.vhackapi.Utils;
@@ -26,7 +27,7 @@ public class UpgradeManager {
 		password = pass;
 	}
 	
-	public UpgradeResult addUpdate(UpgradeType type) {
+	public UpgradeResult addUpdate(UpgradeType type)throws JSONException {
 		
 		JSONObject json = new JSONObject();
 		try {
@@ -57,7 +58,7 @@ public class UpgradeManager {
 		}
 	}
 	
-	public ArrayList<Task> getTasks() {
+	public ArrayList<Task> getTasks() throws JSONException {
 		ArrayList<Task> array = new ArrayList<Task>();
 		JSONObject json = new JSONObject();
 		try {

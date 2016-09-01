@@ -2,6 +2,7 @@ package me.checkium.vhackapi.others;
 
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.checkium.vhackapi.Utils;
@@ -13,7 +14,7 @@ public class Others {
 		username = user;
 		password = pass;
 	}
-	public PackageResult openPackage() {
+	public PackageResult openPackage() throws JSONException{
 		
 		try {
 			TimeUnit.MILLISECONDS.sleep(100);

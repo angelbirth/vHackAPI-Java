@@ -50,10 +50,7 @@ public class Utils {
 		    }
 		    json = new JSONObject(jsonText);
 		    
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (IOException|JSONException e) {
 			
 			// TODO Auto-generated catch block
 			e.printStackTrace();

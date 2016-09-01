@@ -1,5 +1,6 @@
 package me.checkium.vhackapi.console;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class TransferResult {
@@ -10,14 +11,9 @@ public class TransferResult {
 	protected int replost;
 	protected String Ip;
 
-	public TransferResult(JSONObject result, String IP){
+	public TransferResult(JSONObject result, String IP)throws JSONException{
 		Ip = IP;
-		if (result.getString("result").contains("0")) {
-			success = true;
-			
-		} else {
-			success = false;
-		}
+		success = result.getString("result").contains("0");
 		
 		moneyamount = result.getInt("amount");
 		

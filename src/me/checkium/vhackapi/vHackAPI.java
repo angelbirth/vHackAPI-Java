@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.checkium.vhackapi.chat.Chat;
@@ -22,25 +23,23 @@ public class vHackAPI {
 	protected String password;
 	protected String username;
 
-	
-	 public Console getConsole() {
-		 Console console = new Console(username, password);
-		 return console;
-	 }
-	 
-	 public UpgradeManager getUpgradeManager() {
-		 UpgradeManager manager = new UpgradeManager(username, password);
-		 return manager;
-	 }
-	 
-		public AdwareManager getAdwareManager() {
-			AdwareManager manager = new AdwareManager(password, username);
-			return manager;
-		}
-		
+	public Console getConsole() {
+		Console console = new Console(username, password);
+		return console;
+	}
 
-	public String getStats(Stats stat) {
-		
+	public UpgradeManager getUpgradeManager() {
+		UpgradeManager manager = new UpgradeManager(username, password);
+		return manager;
+	}
+
+	public AdwareManager getAdwareManager() {
+		AdwareManager manager = new AdwareManager(password, username);
+		return manager;
+	}
+
+	public String getStats(Stats stat) throws JSONException{
+
 		try {
 			TimeUnit.MILLISECONDS.sleep(200);
 		} catch (InterruptedException e1) {
@@ -48,63 +47,57 @@ public class vHackAPI {
 			e1.printStackTrace();
 		}
 		JSONObject json = null;
-	
-			InputStream is;
-			try {
-				is = new URL(Utils.generateURL("user::::pass", username + "::::" + password, "vh_update.php")).openStream();
-				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-				String jsonText = Utils.readJson(rd);
-			    json = new JSONObject(jsonText);
-			    
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+		InputStream is;
+		try {
+			is = new URL(Utils.generateURL("user::::pass", username + "::::" + password, "vh_update.php")).openStream();
+			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+			String jsonText = Utils.readJson(rd);
+			json = new JSONObject(jsonText);
+			if (json.getString(stat.toString()) == null) {
+				return null;
 			}
 			
-		    
-	
-		
-		if (json.getString(stat.toString()) == null) {
-	    	return null;
-	    }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return json.getString(stat.toString());
 	}
-	
+
 	public Others getOthers() {
 		Others others = new Others(username, password);
 		return others;
 	}
-	
-	public String getUsername(){
+
+	public String getUsername() {
 		return username;
 	}
-	
-	public String getPassword(){
+
+	public String getPassword() {
 		return password;
 	}
+
 	public Chat getChat() {
 		Chat chat = new Chat();
-				return chat;
+		return chat;
 	}
+
 	public vHackAPI(String user, String pass) {
 		username = user;
 		password = pass;
-		//return this;
+		// return this;
 	}
+
 	@Deprecated
 	public vHackAPI getAPI() {
 		return this;
 	}
-	
-	
-	
+
 	public String humanizeString(String unumanized) {
 		switch (unumanized) {
 		case "fw":
-		    return "Firewall";
+			return "Firewall";
 		case "av":
 			return "Antivirus";
 		case "ipsp":
@@ -141,9 +134,9 @@ public class vHackAPI {
 			return "ID";
 		case "btntpc":
 			return "Botnet PC";
-	    default:
-	    	return null;
+		default:
+			return null;
 		}
 	}
-	
+
 }

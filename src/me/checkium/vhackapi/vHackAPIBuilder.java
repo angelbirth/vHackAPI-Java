@@ -1,5 +1,6 @@
 package me.checkium.vhackapi;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class vHackAPIBuilder {
@@ -23,7 +24,7 @@ public class vHackAPIBuilder {
 		 return this;
 	 }
 	 
-	 public vHackAPIBuilder register() {
+	 public vHackAPIBuilder register() throws JSONException{
 		 JSONObject json = Utils.JSONRequest("user::::pass::::email", username + "::::" + password + "::::" + email, "vh_register.php");
 		 if (json.getString("result") != "0") {
 			 return null;
