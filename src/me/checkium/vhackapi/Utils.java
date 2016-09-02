@@ -3,10 +3,6 @@ package me.checkium.vhackapi;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -15,27 +11,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 public class Utils {
     static final boolean assertionstatus;
     private static final byte[] byt;
     public static String url;
     public static String md5s;
     public static String secret;
-    public static TrustManager[] trustAllCerts = new TrustManager[]{
-            new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                }
-
-                public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                }
-            }
-    };
 
     static {
         assertionstatus = !Utils.class.desiredAssertionStatus();
@@ -54,28 +40,28 @@ public class Utils {
         return sb.toString();
     }
 
-    public static JSONObject JSONRequest(String format, String data, String php) {
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, Utils.trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (GeneralSecurityException e) {
-        }
-        JSONObject json = null;
-        InputStream is;
-        try {
-            is = new URL(Utils.generateURL(format, data, php)).openStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-            String jsonText = Utils.readJson(rd);
-            if (jsonText.length() == 1) {
-                return null;
-            }
-            json = new JSONObject(jsonText);
-        } catch (IOException e) {
+    public static JSONObject JSONRequest(String format, String data, String php){
+   	 try {
+		    SSLContext sc = SSLContext.getInstance("SSL");
+		    sc.init(null, Utils.trustAllCerts, new java.security.SecureRandom());
+		    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		} catch (GeneralSecurityException e) {
+		}
+		JSONObject json = null;
+		InputStream is;
+		try {
+			is = new URL(Utils.generateURL(format, data, php)).openStream();
+			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+			String jsonText = Utils.readJson(rd);
+			if (jsonText.length() == 1) {
+				return null;
+		    }
+		    json = new JSONObject(jsonText);
+		} catch (IOException e) {
             e.printStackTrace();
-        }
-        return json;
-    }
+		}
+		return json;
+	}
 
     private static byte[] m9179a(byte[] bArr, int i, int i2, byte[] bArr2, int i3, byte[] bArr3) {
         int i4 = 0;
@@ -173,7 +159,22 @@ public class Utils {
         throw new AssertionError();
     }
 
-    public static String generateURL(String str, String str2, String str3) {
+    public static TrustManager[] trustAllCerts = new TrustManager[] {
+    	    new X509TrustManager() {
+    	        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+    	            return new X509Certificate[0];
+    	        }
+    	        public void checkClientTrusted(
+    	            java.security.cert.X509Certificate[] certs, String authType) {
+    	            }
+    	        public void checkServerTrusted(
+    	            java.security.cert.X509Certificate[] certs, String authType) {
+    	        }
+    	    }
+    	};
+
+
+    public  static String generateURL(String str, String str2, String str3) {
         String[] strArr = new String[2];
         String[] split = str.split("::::");
         String[] split2 = str2.split("::::");
