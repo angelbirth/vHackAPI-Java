@@ -27,7 +27,7 @@ public class Others {
 	
 		JSONObject json = Utils.JSONRequest("user::::pass", username  + "::::" + password, "vh_openFreeBonus.php");
 		if (json == null) {
-			return result;
+			return null;
 	    }
 
         switch(json.getInt("type")) {
@@ -70,7 +70,7 @@ public class Others {
         	 return result;
         	 
         }
-	return result;
+	return null;
    }
 
 }

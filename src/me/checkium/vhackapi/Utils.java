@@ -3,6 +3,10 @@ package me.checkium.vhackapi;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -11,17 +15,27 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 public class Utils {
-    static final boolean assertionstatus;
+    private static final boolean assertionstatus;
     private static final byte[] byt;
-    public static String url;
-    public static String md5s;
-    public static String secret;
+    private static String url;
+    private static String md5s;
+    private static String secret;
+    private static TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
+    };
 
     static {
         assertionstatus = !Utils.class.desiredAssertionStatus();
@@ -29,6 +43,13 @@ public class Utils {
         md5s = "MD5";
         secret = "aeffl";
         byt = new byte[]{(byte) 65, (byte) 66, (byte) 67, (byte) 68, (byte) 69, (byte) 70, (byte) 71, (byte) 72, (byte) 73, (byte) 74, (byte) 75, (byte) 76, (byte) 77, (byte) 78, (byte) 79, (byte) 80, (byte) 81, (byte) 82, (byte) 83, (byte) 84, (byte) 85, (byte) 86, (byte) 87, (byte) 88, (byte) 89, (byte) 90, (byte) 97, (byte) 98, (byte) 99, (byte) 100, (byte) 101, (byte) 102, (byte) 103, (byte) 104, (byte) 105, (byte) 106, (byte) 107, (byte) 108, (byte) 109, (byte) 110, (byte) 111, (byte) 112, (byte) 113, (byte) 114, (byte) 115, (byte) 116, (byte) 117, (byte) 118, (byte) 119, (byte) 120, (byte) 121, (byte) 122, (byte) 48, (byte) 49, (byte) 50, (byte) 51, (byte) 52, (byte) 53, (byte) 54, (byte) 55, (byte) 56, (byte) 57, (byte) 45, (byte) 95};
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, Utils.trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     public static String readJson(Reader rd) throws IOException {
@@ -40,28 +61,22 @@ public class Utils {
         return sb.toString();
     }
 
-    public static JSONObject JSONRequest(String format, String data, String php){
-   	 try {
-		    SSLContext sc = SSLContext.getInstance("SSL");
-		    sc.init(null, Utils.trustAllCerts, new java.security.SecureRandom());
-		    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		} catch (GeneralSecurityException e) {
-		}
-		JSONObject json = null;
-		InputStream is;
-		try {
-			is = new URL(Utils.generateURL(format, data, php)).openStream();
-			BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-			String jsonText = Utils.readJson(rd);
-			if (jsonText.length() == 1) {
-				return null;
-		    }
-		    json = new JSONObject(jsonText);
-		} catch (IOException e) {
+    public static JSONObject JSONRequest(String format, String data, String php) {
+        JSONObject json = null;
+        InputStream is;
+        try {
+            is = new URL(Utils.generateURL(format, data, php)).openStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = Utils.readJson(rd);
+            if (jsonText.length() == 1) {
+                return null;
+            }
+            json = new JSONObject(jsonText);
+        } catch (IOException e) {
             e.printStackTrace();
-		}
-		return json;
-	}
+        }
+        return json;
+    }
 
     private static byte[] m9179a(byte[] bArr, int i, int i2, byte[] bArr2, int i3, byte[] bArr3) {
         int i4 = 0;
@@ -93,7 +108,7 @@ public class Utils {
         return bArr2;
     }
 
-    public static String generateUser(byte[] bArr, int i, int i2, byte[] bArr2, boolean z) {
+    private static String generateUser(byte[] bArr, int i, int i2, byte[] bArr2, boolean z) {
         byte[] a = assertion(bArr, i, i2, bArr2, Integer.MAX_VALUE);
         int length = a.length;
         while (!z && length > 0 && a[length - 1] == 61) {
@@ -102,7 +117,7 @@ public class Utils {
         return new String(a, 0, length);
     }
 
-    public static final String encryptString(String str) {
+    private static String encryptString(String str) {
         try {
             MessageDigest instance = MessageDigest.getInstance(md5s);
             instance.update(str.getBytes());
@@ -122,7 +137,7 @@ public class Utils {
         }
     }
 
-    public static byte[] assertion(byte[] bArr, int i, int i2, byte[] bArr2, int i3) {
+    private static byte[] assertion(byte[] bArr, int i, int i2, byte[] bArr2, int i3) {
         int i4 = ((i2 + 2) / 3) * 4;
         byte[] bArr3 = new byte[(i4 + (i4 / i3))];
         int i5 = i2 - 2;
@@ -159,22 +174,7 @@ public class Utils {
         throw new AssertionError();
     }
 
-    public static TrustManager[] trustAllCerts = new TrustManager[] {
-    	    new X509TrustManager() {
-    	        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-    	            return new X509Certificate[0];
-    	        }
-    	        public void checkClientTrusted(
-    	            java.security.cert.X509Certificate[] certs, String authType) {
-    	            }
-    	        public void checkServerTrusted(
-    	            java.security.cert.X509Certificate[] certs, String authType) {
-    	        }
-    	    }
-    	};
-
-
-    public  static String generateURL(String str, String str2, String str3) {
+    public static String generateURL(String str, String str2, String str3) {
         String[] strArr = new String[2];
         String[] split = str.split("::::");
         String[] split2 = str2.split("::::");
